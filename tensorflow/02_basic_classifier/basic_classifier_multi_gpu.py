@@ -1,10 +1,15 @@
 # TensorFlow and tf.keras
 import tensorflow as tf
 
+# TensorFlow datasets
+import tensorflow_datasets as tfds
+tfds.disable_progress_bar()
+
 # Helper libraries
 import numpy as np
-import matplotlib.pyplot as plt
 import time
+
+from datetime import datetime
 
 gpus = tf.config.list_physical_devices('GPU')
 tf.config.set_logical_device_configuration(
@@ -14,14 +19,17 @@ tf.config.set_logical_device_configuration(
 
 # Import the Fashion MNIST dataset: 70,000 grayscale images of clothes
 # (28 by 28 pixels low-resolution images) in 10 categories
-fashion_mnist = tf.keras.datasets.fashion_mnist
-
-# Separate the dataset into 60,000 images for training and 10,000 for testing
-(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+(ds_train, ds_test), ds_info = tfds.load(
+    'fashion_mnist',
+    split=['train', 'test'],
+    shuffle_files=True,
+    as_supervised=True,
+    with_info=True,
+)
 
 # Print the number of training/testing images
-print(f"Using {train_images.shape} images and {len(train_labels)} labels for training")
-print(f"Using {test_images.shape} images and {len(test_labels)} labels for testing")
+print(f"Using {ds_train.cardinality()} datasets for training")
+print(f"Using {ds_test.cardinality()} datasets for testing")
 
 # Specify the categories
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
@@ -29,13 +37,30 @@ class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
 
 # The pixel values fall in the range of 0 to 255. For the classifier
 # to be effective we have to rescale all values to the range of 0 to 1
-train_images = train_images / 255.0
-test_images = test_images / 255.0
+def normalize_img(image, label):
+    """Normalizes images: `uint8` -> `float32`."""
+    return tf.cast(image, tf.float32) / 255., label
+
+ds_train = ds_train.map(normalize_img)
+ds_train = ds_train.batch(128)
+ds_train = ds_train.cache()
+ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
+
+ds_test = ds_test.map(normalize_img)
+ds_test = ds_test.batch(128)
+ds_test = ds_test.cache()
+ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
+
+# Create a TensorBoard callback
+logs = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+
+tboard_callback = tf.keras.callbacks.TensorBoard(log_dir = logs,
+                                                 histogram_freq = 1,
+                                                 profile_batch = '500,520')
 
 gpus = tf.config.list_logical_devices('GPU')
 strategy = tf.distribute.MirroredStrategy(gpus)
 with strategy.scope():
-#with tf.device("/GPU:0"):
 
     # Start time measurement
     tic = time.perf_counter()
@@ -55,24 +80,13 @@ with strategy.scope():
     model.summary()
     
     # Train the model
-    model.fit(train_images, train_labels, epochs=10)
+    model.fit(ds_train, epochs=10,
+              callbacks = [tboard_callback])
 
     # Stop time measurement
     toc = time.perf_counter()
     print(f"Training completed in {(toc-tic)} seconds")
     
     # Evaluate accuracy
-    test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+    test_loss, test_acc = model.evaluate(ds_test, verbose=2)
     print('\nTest accuracy:', test_acc)
-    
-    # Make predicitons
-    probability_model = tf.keras.Sequential([model,
-                                             tf.keras.layers.Softmax()])
-    
-    predictions = probability_model.predict(test_images)
-    
-    # Inspect prediction of first 10 test data
-    for i in range(10):
-        print(f"Test data #{i}")
-        print(f"Confidence values for all 10 categories\n{predictions[i]}")
-        print(f"Label with highest confidence value is {np.argmax(predictions[i])} correct label is {test_labels[i]}")

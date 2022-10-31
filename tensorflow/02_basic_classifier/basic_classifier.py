@@ -3,7 +3,6 @@ import tensorflow as tf
 
 # Helper libraries
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 
 # Import the Fashion MNIST dataset: 70,000 grayscale images of clothes
