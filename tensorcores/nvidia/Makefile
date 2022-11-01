@@ -294,14 +294,11 @@ cudaTensorCoreGemm.o:cudaTensorCoreGemm.cu
 
 cudaTensorCoreGemm: cudaTensorCoreGemm.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
-	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
-	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 
 run: build
 	$(EXEC) ./cudaTensorCoreGemm
 
 clean:
 	rm -f cudaTensorCoreGemm cudaTensorCoreGemm.o
-	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/cudaTensorCoreGemm
 
 clobber: clean
