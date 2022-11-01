@@ -1,2 +1,5 @@
 logs
 FashionMNIST
+cudaTensorCoreGemm
+TCGemm
+*.o
