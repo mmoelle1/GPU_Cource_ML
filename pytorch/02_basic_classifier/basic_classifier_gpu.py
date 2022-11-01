@@ -11,14 +11,14 @@ batch_size = 128
 
 # Import the Fashion MNIST dataset: 70,000 grayscale images of clothes
 # (28 by 28 pixels low-resolution images) in 10 categories
-fashion_mnist = torchvision.datasets.FashionMNIST(root='.',
+fashion_mnist = torchvision.datasets.FashionMNIST(root='~/pytorch_datasets',
                                                   train=True,
                                                   transform=torchvision.transforms.ToTensor(),
                                                   download=True)
 
 # Separate the dataset into 50,000 images for training and 10,000 for testing
 ds_train, ds_val = torch.utils.data.random_split(fashion_mnist, [50000, 10000])
-ds_test = torchvision.datasets.FashionMNIST(root='.',
+ds_test = torchvision.datasets.FashionMNIST(root='~/pytorch_datasets',
                                             train=False,
                                             transform=torchvision.transforms.ToTensor())
 
