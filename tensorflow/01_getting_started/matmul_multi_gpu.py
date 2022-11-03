@@ -20,4 +20,4 @@ with tf.device("/GPU:1"):
         c = tf.matmul(a, b);
         toc = time.perf_counter()
         mem_usage = tf.config.experimental.get_memory_usage("GPU:1")
-        print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds for multiplying {n}x{n} matrices using {mem_usage} bytes of memory")
+        print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds per entry for multiplying {n}x{n} matrices using {mem_usage} bytes of memory")

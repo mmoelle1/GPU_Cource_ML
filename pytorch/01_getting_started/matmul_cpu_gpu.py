@@ -10,7 +10,7 @@ for n in [10, 50, 100, 500, 1000, 5000, 10000]:
     tic = time.perf_counter()
     c = torch.matmul(a, b);
     toc = time.perf_counter()
-    print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds for multiplying {n}x{n} matrices")
+    print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds per entry for multiplying {n}x{n} matrices")
 
 print(f"Time measurement on GPU")
 for n in [10, 50, 100, 500, 1000, 5000, 10000]:
@@ -19,4 +19,4 @@ for n in [10, 50, 100, 500, 1000, 5000, 10000]:
     tic = time.perf_counter()
     c = torch.matmul(a, b);
     toc = time.perf_counter()
-    print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds for multiplying {n}x{n} matrices using {torch.cuda.memory_allocated()} bytes of memory")
+    print(f"Spent {(toc-tic)/(n*n*n):.2e} seconds per entry for multiplying {n}x{n} matrices using {torch.cuda.memory_allocated()} bytes of memory")
