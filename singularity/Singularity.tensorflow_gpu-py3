@@ -1,8 +1,9 @@
 Bootstrap: docker
-From: tensorflow/tensorflow:latest-gpu-py3-jupyter
+From: tensorflow/tensorflow:latest-gpu-jupyter
 
 # Adapted by Kees Lemmens, Aug 2018
 # Adapted by Matthias Moller, Nov 2022
+# Adapted by Joffrey Wallaart, Nov 2022
 
 %post
     # create a writable /run/user directory or else the jupyter notebooks won't work:
