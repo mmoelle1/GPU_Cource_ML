@@ -14,6 +14,9 @@ From: tensorflow/tensorflow:latest-jupyter
     pip install tensorboard tensorboard_plugin_profile tensorflow_datasets
 
 %environment
+    # set environment variable to prevent oneDNN custom operations on all systems
+    # oneDNN can produce slightly different results due roundoff errors from different computation orders
+    export TF_ENABLE_ONEDNN_OPTS=0
 
 %runscript
     exec /bin/bash -i
